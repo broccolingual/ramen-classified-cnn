@@ -32,6 +32,7 @@ for f in files:
         jiro += 1
     elif idx == 1:
         print(f"その他のラーメン: {per}%")
+    print(f"{f}\n")
     os.rename(f, os.path.join(os.path.dirname(
         f), f"{idx}_{per}%_{uuid.uuid4()}.jpg"))
 
