@@ -1,5 +1,6 @@
 import glob
 import os
+import shutil
 import uuid
 
 from keras.models import load_model
@@ -30,11 +31,11 @@ for f in files:
     if idx == 0:
         print(f"二郎系ラーメン: {per}%")
         jiro += 1
+        if per >= 80:
+            shutil.move(f, "./p_jiro")
     elif idx == 1:
         print(f"その他のラーメン: {per}%")
     print(f"{f}\n")
-    os.rename(f, os.path.join(os.path.dirname(
-        f), f"{idx}_{per}%_{uuid.uuid4()}.jpg"))
 
 print(f"All: {all}")
 print(f"Jiro: {round(jiro / all * 100)} %")

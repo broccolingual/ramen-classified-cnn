@@ -1,6 +1,6 @@
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Activation, Dropout, Flatten, Dense
-from keras.optimizers import RMSprop, Adam, SGD, Adagrad
+from keras.optimizers import Adam
 from keras.utils import np_utils
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,28 +23,21 @@ def train(x_train, y_train, x_test, y_test):
     model = Sequential()
 
     # Conv Layer 1
-    model.add(Conv2D(64, (3, 3), padding='same',
+    model.add(Conv2D(32, (3, 3), padding='same',
               input_shape=x_train.shape[1:]))
     model.add(Activation('relu'))
     # Pooling Layer 1
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.1))
+
     # Conv Layer 2
-    model.add(Conv2D(32, (3, 3), padding='same'))
+    model.add(Conv2D(64, (3, 3), padding='same'))
     model.add(Activation('relu'))
     # Pooling Layer 2
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
-    # Conv Layer 3
-    model.add(Conv2D(16, (3, 3), padding='same'))
-    model.add(Activation('relu'))
+
     # Fully Connected Layer
     model.add(Flatten())
-    model.add(Dense(96))
+    model.add(Dense(256))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     # Output Layer
@@ -52,15 +45,15 @@ def train(x_train, y_train, x_test, y_test):
     model.add(Activation('softmax'))
 
     # Optimizer
-    rms = RMSprop(lr=1e-4, decay=1e-6)
+    adam = Adam()
 
     model.compile(loss='categorical_crossentropy',
-                  optimizer=rms, metrics=['accuracy'])
+                  optimizer=adam, metrics=['accuracy'])
 
     hist = model.fit(x_train, y_train,
                      batch_size=128,
-                     epochs=30,
-                     verbose=0,
+                     epochs=20,
+                     verbose=1,
                      validation_data=(x_test, y_test))
     return model, hist
 
@@ -76,7 +69,7 @@ if __name__ == '__main__':
     plt.title("Accuracy")
     plt.ylabel('Accuracy')
     plt.xlabel('Epoch')
-    plt.legend(["train", "test"], loc="upper left")
+    plt.legend(["train", "validation"], loc="upper left")
     plt.tight_layout()
 
     plt.subplot(1, 2, 2)
@@ -85,7 +78,7 @@ if __name__ == '__main__':
     plt.title("Loss")
     plt.ylabel('Loss')
     plt.xlabel('Epoch')
-    plt.legend(["train", "test"], loc="upper left")
+    plt.legend(["train", "validation"], loc="upper left")
     plt.tight_layout()
     plt.show()
 
