@@ -1,13 +1,12 @@
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Activation, Dropout, Flatten, Dense
-from keras.optimizers import RMSprop, Adam
+from keras.optimizers import RMSprop, Adam, SGD, Adagrad
 from keras.utils import np_utils
 import matplotlib.pyplot as plt
 import numpy as np
 
 classes = ["jiro", "other"]
 num_classes = len(classes)
-image_size = 128
 
 
 def load_data():
@@ -24,25 +23,28 @@ def train(x_train, y_train, x_test, y_test):
     model = Sequential()
 
     # Conv Layer 1
-    model.add(Conv2D(32, (3, 3), padding='same',
+    model.add(Conv2D(64, (3, 3), padding='same',
               input_shape=x_train.shape[1:]))
     model.add(Activation('relu'))
     # Pooling Layer 1
-    model.add(Conv2D(32, (3, 3)))
+    model.add(Conv2D(64, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.1))
     # Conv Layer 2
-    model.add(Conv2D(16, (3, 3), padding='same'))
+    model.add(Conv2D(32, (3, 3), padding='same'))
     model.add(Activation('relu'))
     # Pooling Layer 2
-    model.add(Conv2D(16, (3, 3)))
+    model.add(Conv2D(32, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.25))
+    # Conv Layer 3
+    model.add(Conv2D(16, (3, 3), padding='same'))
+    model.add(Activation('relu'))
     # Fully Connected Layer
     model.add(Flatten())
-    model.add(Dense(128))
+    model.add(Dense(96))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     # Output Layer
@@ -50,16 +52,15 @@ def train(x_train, y_train, x_test, y_test):
     model.add(Activation('softmax'))
 
     # Optimizer
-    opt = RMSprop(lr=0.00005, decay=1e-6)
-    # opt = Adam(lr=1e-3)
+    rms = RMSprop(lr=1e-4, decay=1e-6)
 
     model.compile(loss='categorical_crossentropy',
-                  optimizer=opt, metrics=['accuracy'])
+                  optimizer=rms, metrics=['accuracy'])
 
     hist = model.fit(x_train, y_train,
                      batch_size=128,
-                     epochs=50,
-                     verbose=2,
+                     epochs=30,
+                     verbose=0,
                      validation_data=(x_test, y_test))
     return model, hist
 
